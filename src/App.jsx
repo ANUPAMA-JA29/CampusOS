@@ -1,122 +1,99 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+
+import { useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+
+import SplashScreen from "./pages/public/SplashScreen";
+import Welcome from "./pages/public/Welcome";
+import Login from "./pages/public/Login";
+import PendingApproval from "./pages/company/PendingApproval";
+import Jobs from "./pages/student/Jobs";
+import StudentDashboard from "./pages/student/StudentDashboard";
+import CompanyDashboard from "./pages/company/CompanyDashboard";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import StudentProfile from "./pages/student/StudentProfile";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [showSplash, setShowSplash] = useState(true);
+
+  if (showSplash) {
+    return (
+      <SplashScreen onFinish={() => setShowSplash(false)} />
+    );
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <Routes>
+      {/* Public pages */}
+      <Route path="/" element={<Navigate to="/welcome" replace />} />
+      <Route path="/welcome" element={<Welcome />} />
+      <Route path="/login/:role" element={<Login />} />
 
-      <div className="ticks"></div>
+      {/* Student dashboard */}
+      <Route
+        path="/student/dashboard"
+        element={
+          <ProtectedRoute allowedRole="student">
+            <StudentDashboard />
+          </ProtectedRoute>
+        }
+      />
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      {/* Company dashboard */}
+      <Route
+        path="/company/dashboard"
+        element={
+          <ProtectedRoute allowedRole="company">
+            <CompanyDashboard />
+          </ProtectedRoute>
+        }
+      />
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      {/* Company pending approval */}
+      <Route
+        path="/company/pending-approval"
+        element={
+          <ProtectedRoute
+            allowedRole="company"
+            allowPending={true}
+          >
+            <PendingApproval />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Admin dashboard */}
+      <Route
+        path="/admin/dashboard"
+        element={
+          <ProtectedRoute allowedRole="admin">
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+     <Route
+  path="/student/profile"
+  element={
+    <ProtectedRoute allowedRole="student">
+      <StudentProfile />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/student/jobs"
+  element={
+    <ProtectedRoute allowedRole="student">
+      <Jobs />
+    </ProtectedRoute>
+  }
+/>
+      {/* Unknown routes */}
+      <Route
+        path="*"
+        element={<Navigate to="/welcome" replace />}
+      />
+    </Routes>
+  );
 }
 
-export default App
+export default App;
